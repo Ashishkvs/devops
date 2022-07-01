@@ -2,19 +2,19 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Build') {
             steps {
-                echo 'Hello World'
+                echo 'Build java Application'
             }
         }
-         stage('Good bye') {
+         stage('Test') {
             steps {
-                echo 'Hello World'
+                echo 'Testing Junit'
             }
         }
-        stage('Final Step') {
+        stage('Deploy') {
             steps {
-                echo 'Hello World'
+                echo 'Deploying'
             }
         }
     }
