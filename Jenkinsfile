@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-         stage('Build') {
+         stage('Git Checkout') {
             steps {
                 echo 'Fetching Git Repo $GIT_BRANCH'
                 git 'https://github.com/Ashishkvs/Juint-test-case'
