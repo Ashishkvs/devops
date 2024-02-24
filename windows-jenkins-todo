@@ -1,0 +1,19 @@
+# jenkins Local-setup TODO checklist
+===================
+Git credential setup 
+https://github.com/settings/tokens
+
+Token
+======
+ghp_sdsdsdsdaeasSMTs66mPH9f3CwxoW
+
+
+SYSTEM_VARIABLES
+====================
+In the System variables section, click New (or User variables for single user setting)
+Set JAVA_HOME as the Variable name and the path to the JDK installation as the Variable value
+Click OK
+
+MAVEN_HOME
+GRADLE_HOME
+JAVA_HOME
