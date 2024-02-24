@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get some code from a GitHub repository restaurant-feature  refactor-payment  'release-2.0' 'restaurant-feature'
+                git branch: 'PreApproved-UI' , credentialsId: 'eb249103-b181-406d-a45c-7f10b9156cde', url: 'https://github.com/Ashishkvs/Omsent-UI.git'
+          
+            }
+
+        }
+        stage('npm packages') {
+            steps {
+                echo "Installing npm packages"
+               bat "npm install"
+            
+            }
+
+        }
+        stage('Build') {
+            steps {
+                echo "Building angular application"
+                bat "npm run build --source-map=false"
+
+            }
+
+        }
+         stage('SSH Copy Files') {
+            steps {
+                echo "Deploying omsent.com"
+                sshagent(['vps2-hostinger']) {
+                 sh '''
+                    StrictHostKeyChecking=no  
+                    # sh root@151.106.125.38 rm -rf /usr/production/user-ui/
+                    scp -r C:/ProgramData/Jenkins/.jenkins/workspace/omsent/dist/omsent/*.* root@151.106.125.38:/usr/production/user-ui/
+                 '''
+                } 
+            }
+          
+        }
+        //   stage('Deploying omsent.com') {
+        //     steps {
+        //         echo "Deploying omsent.com"
+        //         sshagent(['vps2-hostinger']) {
+        //          sh '''
+        //             StrictHostKeyChecking=no  
+        //             sh root@151.106.125.38 docker run -v /usr/production/user-ui:/usr/share/nginx/html/ -d -e  VIRTUAL_HOST=omsent.com -e LETSENCRYPT_HOST=omsent.com --network=production_default --expose=80 --name=omsent.com nginx-container-common:latest 
+        //          '''
+        //         } 
+        //     }
+          
+        // }
+          //   stage('Deploying omsent.com') {
+        //     steps {
+        //         echo "Deploying omsent.com"
+        //         sshagent(['vps2-hostinger']) {
+        //          sh '''
+        //             StrictHostKeyChecking=no  
+        //             sh root@151.106.125.38 docker run -v /usr/production/user-ui:/usr/share/nginx/html/ -d -e  VIRTUAL_HOST=www.omsent.com -e LETSENCRYPT_HOST=www.omsent.com --network=production_default --expose=80 --name=www.omsent.com nginx-container-common:latest 
+        //          '''
+        //         } 
+        //     }
+          
+        // }
+    }
+}

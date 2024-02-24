@@ -1,0 +1,77 @@
+pipeline {
+    agent any
+
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get some code from a GitHub repository
+                git branch: 'master', credentialsId: 'eb249103-b181-406d-a45c-7f10b9156cde', url: 'https://github.com/Ashishkvs/Notification.git'
+
+            }
+
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building Java application"
+                bat "gradlew clean build"
+
+            }
+          
+        }
+          stage('Test') {
+            steps {
+                bat './gradlew check'
+            }
+              post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    //junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'build/libs/*.jar'
+                }
+                // always{
+                //      junit 'build/reports/**/*.xml'
+                // }
+                
+            }
+
+        }
+         stage('SSH Connection') {
+            steps {
+                echo "Connect bigrock server via ssh"
+                sshagent(['hostinger-ssh']) {
+                     sh 'StrictHostKeyChecking=no  scp -r C:/ProgramData/Jenkins/.jenkins/workspace/notification.omsent.com/build/libs/*.jar root@213.190.4.169:/usr/production/backend/'
+                } 
+            }
+          
+        }
+       stage('SSH Stop Server') {
+            steps {
+                echo "Stoping docker server"
+                sshagent(['hostinger-ssh']) {
+                    sh '''
+                        StrictHostKeyChecking=no 
+                        ssh root@213.190.4.169 docker stop apinotification
+                        ssh root@213.190.4.169 docker rm apinotification
+                    '''
+                }
+            }
+       }
+       
+        stage('SSH Deploy') {
+            steps {
+                echo "Deploying notification.omsent.com"
+                sshagent(['hostinger-ssh']) {
+                    sh '''
+                        StrictHostKeyChecking=no 
+                        ssh root@213.190.4.169 docker build -t openjdk11-apinotification -f /usr/production/java-notification.dockerfile /usr/production/
+						ssh root@213.190.4.169 docker run -d -e  VIRTUAL_HOST=notification.omsent.com -e LETSENCRYPT_HOST=notification.omsent.com --network=production_default --expose=9999 --name=apinotification openjdk11-apinotification:latest   
+                    '''
+                } 
+            }
+          
+        }
+    }
+}

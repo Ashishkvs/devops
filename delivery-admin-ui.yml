@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get some code from a GitHub repository
+                git branch: 'delivery-admin', credentialsId: 'eb249103-b181-406d-a45c-7f10b9156cde', url: 'https://github.com/Ashishkvs/Omsent-UI.git'
+          
+            }
+
+        }
+        stage('npm packages') {
+            steps {
+                echo "Installing npm packages"
+               bat "npm install"
+            
+            }
+
+        }
+        stage('Build') {
+            steps {
+                echo "Building angular application"
+                bat "npm run build"
+
+            }
+
+        }
+         stage('SSH Deploy') {
+            steps {
+                echo "Connect bigrock server via ssh"
+                sshagent(['hostinger-ssh']) {
+                 sh '''
+                    StrictHostKeyChecking=no  scp -r C:/ProgramData/Jenkins/.jenkins/workspace/delivery-admin-ui/dist/omsent/*.* root@213.190.4.169:/usr/production/delivery-admin/
+                 '''
+                } 
+            }
+          
+        }
+    }
+}

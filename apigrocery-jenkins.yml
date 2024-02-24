@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get some code from a GitHub repository master
+                git branch: 'grocery', credentialsId: 'eb249103-b181-406d-a45c-7f10b9156cde', url: 'https://github.com/Ashishkvs/restaurant.git'
+          
+            }
+
+        }
+      
+        stage('Build') {
+            steps {
+                echo "Building Java application"
+                bat "gradlew clean build"
+
+            }
+              post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    //junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'build/libs/*.jar'
+                }
+            }
+
+        }
+        stage('SSH Connection') {
+            steps {
+                echo "Connect bigrock server via ssh"
+                sshagent(['vps2-hostinger']) {
+                     sh 'StrictHostKeyChecking=no  scp -r C:/ProgramData/Jenkins/.jenkins/workspace/apigrocery/build/libs/*.jar root@151.106.125.38:/usr/production/backend/'
+                } 
+            }
+          
+        }
+         stage('SSH Stop Server') {
+            steps {
+                echo "Stoping docker server"
+                sshagent(['vps2-hostinger']) {
+                    sh '''
+                        StrictHostKeyChecking=no 
+                        ssh root@151.106.125.38 docker stop apigrocery
+                        ssh root@151.106.125.38 docker rm apigrocery
+                    '''
+                }
+            }
+       }
+       
+        stage('SSH Deploy') {
+            steps {
+                echo "Deploying apigrocery.omsent.com"
+                sshagent(['vps2-hostinger']) {
+                    sh '''
+                        StrictHostKeyChecking=no 
+                        ssh root@151.106.125.38 docker build -t  openjdk11-apigrocery  -f /usr/production/java-restaurant.dockerfile /usr/production/
+                        ssh root@151.106.125.38 docker run -d -e  VIRTUAL_HOST=apigrocery.omsent.com -e LETSENCRYPT_HOST=apigrocery.omsent.com --network=production_default --expose=8888 --name=apigrocery openjdk11-apigrocery:latest   
+
+                    '''
+                } 
+            }
+          
+        }
+        //  stage('Server Logs') {
+        //     steps {
+        //         echo "Fetching apigrocery.omsent.com logs"
+        //         sshagent(['vps2-hostinger']) {
+        //             sh '''
+        //                 StrictHostKeyChecking=no 
+        //                 ssh root@151.106.125.38 docker logs -f apigrocery --tail 40
+ 
+        //             '''
+        //         } 
+        //     }
+          
+        // }
+    }
+}

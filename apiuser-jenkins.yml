@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get some code from a GitHub repository
+                git branch: 'referral-features', credentialsId: 'eb249103-b181-406d-a45c-7f10b9156cde', url: 'https://github.com/Ashishkvs/UserSystem-Ecommerce.git'
+
+            }
+
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building Java application"
+                bat "gradlew clean build"
+
+            }
+          
+        }
+          stage('Test') {
+            steps {
+                bat './gradlew check'
+            }
+              post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    //junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'build/libs/*.jar'
+                }
+                // always{
+                //      junit 'build/reports/**/*.xml'
+                // }
+                
+            }
+
+        }
+         stage('SSH Connection') {
+            steps {
+                echo "Connect bigrock server via ssh"
+                sshagent(['vps2-hostinger']) {
+                     sh 'StrictHostKeyChecking=no  scp -r C:/ProgramData/Jenkins/.jenkins/workspace/apiuser/build/libs/*.jar root@151.106.125.38:/usr/production/backend/'
+                } 
+            }
+          
+        }
+        stage('SSH Stop Server') {
+            steps {
+                echo "Stoping docker server"
+                sshagent(['vps2-hostinger']) {
+                    sh '''
+                        StrictHostKeyChecking=no 
+                        ssh root@151.106.125.38 docker stop apiuser
+                        ssh root@151.106.125.38 docker rm apiuser
+                    '''
+                }
+            }
+       }
+       
+        stage('SSH Deploy') {
+            steps {
+                echo "Deploying apiuser.omsent.com"
+                sshagent(['vps2-hostinger']) {
+                    sh '''
+                        StrictHostKeyChecking=no 
+                        ssh root@151.106.125.38 docker build -t openjdk11-java  -f /usr/production/java-user.dockerfile /usr/production/
+                        ssh root@151.106.125.38 docker run -d -e  VIRTUAL_HOST=apiuser.omsent.com -e LETSENCRYPT_HOST=apiuser.omsent.com --network=production_default   --expose=7777 --name=apiuser openjdk11-java:latest
+ 
+                    '''
+                } 
+            }
+          
+        }
+        //  stage('Server Logs') {
+        //     steps {
+        //         echo "Fetching apiuser.omsent.com logs"
+        //         sshagent(['vps2-hostinger']) {
+        //             sh '''
+        //                 StrictHostKeyChecking=no 
+        //                 ssh root@151.106.125.38 docker logs -f apiuser --tail 10
+ 
+        //             '''
+        //         } 
+        //     }
+          
+        // }
+    }
+}

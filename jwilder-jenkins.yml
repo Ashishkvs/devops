@@ -1,0 +1,23 @@
+
+node {
+ 
+    stage('Testing BIGROCK VPS connection'){
+           sshagent(['vps2-hostinger']) {
+         sh 'ssh -o StrictHostKeyChecking=no -l root 151.106.125.38 uname -a'
+    }}
+    
+ /*   Required only 1st time
+ 
+ stage('Creating folder structure'){
+           sshagent(['vps2-hostinger']) {
+          sh '''
+                        StrictHostKeyChecking=no
+                        ssh root@151.106.125.38 cd /usr
+                        // ssh root@151.106.125.38 mkdir /usr/production
+                        ssh root@151.106.125.38 mkdir /usr/production/backend
+                        
+                    '''
+    }}
+    
+  */
+}
