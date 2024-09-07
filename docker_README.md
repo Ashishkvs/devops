@@ -8,3 +8,14 @@ docker rm -vf $(docker ps -aq)
 docker rmi -f $(docker images -aq)
 # Use this to delete everything
 docker system prune -a --volumes
+
+
+
+# docker user group add
+sudo usermod -aG docker $USER
+
+# docker stop all container
+docker stop $(docker ps -a -q)
+
+# docker start all container
+docker start $(docker ps -a -q)

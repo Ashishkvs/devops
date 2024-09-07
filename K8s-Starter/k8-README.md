@@ -30,11 +30,6 @@ kubectl get ns
 # ingress deployment
 kubectl get all -n ingress-nginx
 
-# docker group add
-sudo usermod -aG docker $USER
-
-# docker command
-docker stop $(docker ps -a -q)
 
 # ref
 https://github.com/devopsproin/certified-kubernetes-administrator/tree/main/Namespace
