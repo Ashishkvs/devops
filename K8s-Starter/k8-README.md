@@ -19,13 +19,13 @@ kind delete cluster --name=<cluster_name>
 kind create cluster --name=<cluster_name> --config=<multi-node-config.yml>
 
 # switch between multiple cluster
-kubectl config get-contexts
-kubectl config use-context <kind-name>
+1. kubectl config get-contexts
+2. kubectl config use-context <kind-name>
 
 
 # kubectl commands
-kubectl get no
-kubectl get ns
+1. kubectl get no
+2. kubectl get ns
 
 # ingress deployment
 kubectl get all -n ingress-nginx
