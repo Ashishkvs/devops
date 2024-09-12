@@ -19,3 +19,7 @@ docker stop $(docker ps -a -q)
 
 # docker start all container
 docker start $(docker ps -a -q)
+
+
+# ref
+https://docs.docker.com/reference/dockerfile/
