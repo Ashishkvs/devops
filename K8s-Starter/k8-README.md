@@ -1,8 +1,8 @@
 # installation
 ===========
-kubectl
-kind
-docker
+-> kubectl
+-> kind
+-> docker
 
 cluster(physical or virtual logical group )
 node
