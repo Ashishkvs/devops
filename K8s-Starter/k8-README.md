@@ -1,8 +1,8 @@
 # installation
 ===========
--> kubectl
--> kind
--> docker
+1. kubectl
+2. kind
+3. docker
 
 cluster(physical or virtual logical group )
 node
