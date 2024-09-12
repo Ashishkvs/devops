@@ -21,5 +21,8 @@ docker stop $(docker ps -a -q)
 docker start $(docker ps -a -q)
 
 
-# ref
+# docker command cheatsheet
 https://docs.docker.com/reference/dockerfile/
+
+ # guided references
+ https://docs.docker.com/get-started/workshop/02_our_app/
