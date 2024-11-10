@@ -48,7 +48,7 @@ kind create cluster --name=ingress-cluster --config=kind-ingress-config.yml
 # create ingress controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
-# creat edeployment
+# create deployment
 kubectl create deploy sample-1 --image=devopsprosamples/next-path-sample-1
 kubectl create deploy sample-2 --image=devopsprosamples/next-path-sample-2
 kubectl create deploy sample-3 --image=devopsprosamples/next-sample-1
