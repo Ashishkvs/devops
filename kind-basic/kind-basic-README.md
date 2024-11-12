@@ -25,3 +25,15 @@ kubectl exec nginx-pod -- ls /usr/share/nginx/html
 https://chatgpt.com/share/673045d3-34e4-8002-8f06-1cc97f42afa7
 
 
+# node 
+kubectl get nodes -o wide
+
+# node name find
+kind get clusters
+# load local docker image to kind cluster dev
+kind load docker-image --name=dev  documents-user-api:latest
+# load all cluster context
+kubectl config get-contexts
+
+# use kind
+kubectl cluster-info --context kind-dev

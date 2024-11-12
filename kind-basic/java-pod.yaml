@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: java-application
+  labels:
+    app: user-app
+spec:
+  containers:
+  - name: user-api
+    image: documents-user-api:latest
+    imagePullPolicy: Never
+    ports:
+    - containerPort: 9898
+# local image send to k8 cluster
+# node name find
+# kind get clusters
+# load local docker image to kind cluster dev
+# kind load docker-image --name=dev  documents-user-api:latest
+# kubectl apply -f kind-basic/java-pod.yaml
